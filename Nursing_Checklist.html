@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Nursing Checklist</title>
+
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <style>
+    #container h1 {
+      font-size: 64px;
+      color: #ff3300;
+    }
+    .flex-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    width : 80%;
+    overflow-y: auto;
+    max-height: 40em;
+    }
+    textarea {
+      height : 150px !important;
+    }
+    .incomplete {
+      background-color: rgb(157, 217, 219);
+    }
+    .complete {
+     background-color: rgb(127, 209, 110) !important;
+    }
+    .editing {
+     background-color: rgb(214, 221, 146) !important;
+    }
+    .taskDesc {
+    background-color: #f1f1f1;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    white-space: pre-line;
+    }
+    .Del {
+    width: 10% !important;
+    background-color: #da5e5e;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    cursor : pointer;
+    max-width: 100px;
+    max-height: 100px;
+    }
+    .edit {
+    width: 10% !important;
+    background-color: #3f73c2;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    cursor : pointer;
+    max-width: 100px;
+      max-height: 100px;
+    }
+    .check {
+    width: 10% !important;
+    background-color: #3f73c2;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    cursor : pointer;
+    max-width: 100px;
+    max-height: 100px;
+    }
+    .flex-container div {
+      display: flex;
+      flex-direction: row;
+      width : 100%;
+      border-radius: 25px;
+      margin-bottom: 1em;
+    }
+    .img {
+      height: 100%;
+      width: 100%;
+      max-width: 100px;
+      max-height: 100px;
+    }
+    .title {
+      color: #111; font-family: 'Helvetica Neue', sans-serif;
+      font-size: 75px; font-weight: bold;
+      letter-spacing: 1px; line-height: 1;
+      text-align: center;
+    }
+    .inputs {
+      width : 60%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .inputs > textarea {
+      display: inline;
+      width: 60%;
+      height: 50px;
+    }
+    .inputs > button {
+      position: relative;
+      width : 30%;
+      height : 40px;
+      top : -20px;
+      margin-left: 2em;
+
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <script type="text/babel">
+
+
+    //checklist objects are structured as follows {task : "" , id : 0 , completed : "string" , img : complete}
+
+    class NuringChecklist extends React.Component {
+        constructor (props) {
+          super(props);
+          this.state = {
+            checklist : [],
+            num_items : 3,
+            edit_id : 0,
+            new_item : "",
+            button_mode : "Add Item",
+            incomplete_img : "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Red_X.svg/1200px-Red_X.svg.png",
+            complete_img : "https://www.pngmart.com/files/16/Green-Check-Mark-Transparent-Background.png"
+          }
+
+          this.state.checklist[3] = {task : "Take patients blood pressure and heart rate. \r\n Systolic :\r\n Diastolic :\r\n HR :" ,  completed : "incomplete" , img : this.state.incomplete_img , id : 0 };
+          this.state.checklist[1] = {task : "Record Patients Height and weight \r\n Height :\r\n Weight :" ,  completed : "incomplete" , img : this.state.incomplete_img , id : 1 };
+          this.state.checklist[2] = {task : "Medical History  \r\n Medications :\r\n Pre-existing Conditions :" ,  completed : "incomplete" , img : this.state.incomplete_img , id : 2 };
+          this.state.checklist[0] = {task : "Record patients Demographics. \r\n First Name : \r\n Last Name :\r\n Address :\r\n Phone # :\r\n Insurance :\r\n " ,  completed : "incomplete" , img : this.state.incomplete_img , id : 3 };
+
+        }
+
+
+        //Add an item to the array of objects
+        addItem () {
+            let new_list = this.state.checklist;
+            let next_num = this.state.num_items + 1;
+
+            let in_check = this.state.new_item.trim();
+
+            if (in_check != "") {
+
+            new_list.push({task : this.state.new_item , completed : "incomplete" , img : this.state.incomplete_img , id : next_num});
+
+            }
+            else {
+              alert("Cannot input a blank item");
+            }
+            this.setState({checklist : new_list , num_items : next_num , button_mode : "Add Item" , new_item : "" });
+        }
+
+        //When clicking the check mark or red x alternate the image shown and change the list objects status accordingly
+        itemChecked (id) {
+          let new_list = this.state.checklist;
+
+          for (let i = 0; i <= this.state.checklist.length - 1; i++) {
+
+            if ((id == this.state.checklist[i].id) && (this.state.checklist[i].completed == "incomplete")) {
+              new_list[i].completed = "complete";
+              new_list[i].img = this.state.complete_img;
+              this.setState({checklist : new_list});
+            }
+            else if ((id == new_list[i].id) && (new_list[i].completed == "complete")) {
+              new_list[i].completed = "incomplete";
+              new_list[i].img = this.state.incomplete_img;
+              this.setState({checklist : new_list});
+
+            }
+            else if ((id == new_list[i].id) && (new_list[i].completed == "editing")) {
+              alert("you cannot complete an item when editing it");
+            }
+          }
+        }
+
+        //Delete the desired item from the array
+        deleteItem (id) {
+          let new_list = this.state.checklist;
+
+          for (let i = 0; i <= this.state.checklist.length - 1; i++) {
+
+            if (id == new_list[i].id) {
+
+              new_list.splice( i , 1);
+
+            }
+          }
+
+          this.setState({checklist : new_list});
+        }
+
+        //Populate the text area with selected edit item and remove it from the array, also changes the button text to edit
+        //The user must complete the edit before being allowed to edit a different item
+        editItem (id) {
+
+          let new_list = this.state.checklist;
+
+          if (this.state.button_mode == "Add Item") {
+
+          for (let i = 0; i <= new_list.length - 1; i++) {
+          if (this.state.checklist[i].id == id) {
+            new_list[i].prev_state = new_list[i].completed;
+            new_list[i].completed = "editing";
+            this.setState({checklist : new_list , new_item : this.state.checklist[i].task ,  button_mode : "Edit" , edit_id : id});
+
+          }
+          }
+          }
+          else {
+            let new_edit = "";
+
+            for (let i = 0; i <= new_list.length - 1; i++) {
+              if (new_list[i].id == this.state.edit_id) {
+                  new_list[i].task = this.state.new_item;
+                  new_list[i].completed = new_list[i].prev_state;
+              }
+              if (new_list[i].id == id) {
+                new_list[i].prev_state = new_list[i].completed;
+                new_list[i].completed = "editing";
+                new_edit = new_list[i].task;
+              }
+            }
+            this.setState({checklist : new_list , edit_id : id , new_item : new_edit , button_mode : "Edit"});
+          }
+
+        }
+
+        submiteEditedItem () {
+          let new_list = this.state.checklist;
+
+
+          for (let i = 0; i <= this.state.checklist.length - 1; i++) {
+
+            if (new_list[i].id == this.state.edit_id) {
+              new_list[i].task = this.state.new_item;
+              new_list[i].completed = new_list[i].prev_state;
+              if (new_list[i].prev_state == "completed") {
+              new_list[i].img = this.state.complete_img;
+              } else {
+                this.state.incomplete_img;
+              }
+              
+            }
+          }
+          this.setState({checklist : new_list , button_mode : "Add Item", new_item : "" });
+          
+        }
+
+        changingInput (event) {
+
+          let new_list = this.state.checklist;
+          let item = event.target.value;
+          
+
+          if (this.state.button_mode == "Edit") {
+            for (let i = 0; i <= new_list.length - 1; i++) {
+              if (this.state.edit_id == new_list[i].id) {
+                new_list[i].task = item;
+                this.setState({new_item : item, checklist : new_list});
+              }
+            }
+          }
+          else {
+            this.setState({new_item : item}); 
+          }
+
+        }
+        
+
+
+
+
+        render () {
+
+          let butt = '';
+
+          if (this.state.button_mode == "Edit") {
+
+            butt = <button onClick={this.submiteEditedItem.bind(this)}> Edit </button> 
+          }
+          else if (this.state.button_mode == "Add Item") {
+            butt = <button onClick={this.addItem.bind(this)}> Add Item </button>
+          }
+
+          return (
+            <div>
+              <h1 className="title"> Nursing Checklist </h1>
+              <div className="inputs">
+              <textarea onChange={this.changingInput.bind(this)} value={this.state.new_item}> </textarea>
+              {butt}
+              </div>
+              <div className="flex-container">
+                {this.state.checklist.map((x) =>  <div className={x.completed} key={x.id}>
+                                                  <div className="taskDesc"> {x.task} </div>
+                                                  <div className="edit" onClick={this.editItem.bind(this, x.id)}> <img className="img" src="https://www.freeiconspng.com/thumbs/edit-icon-png/edit-new-icon-22.png"/> </div>
+                                                  <div className="Del" onClick={this.deleteItem.bind(this , x.id)}> <img className="img" src="https://cdn-icons-png.flaticon.com/512/1345/1345874.png"/> </div>
+                                                  <div className="check" onClick={this.itemChecked.bind(this , x.id)}> <img className="img"  src={x.img}/></div>
+                                                  </div>)}
+              </div>
+
+            </div>
+          )
+        }
+    }
+
+
+    // Use JSX to create <h1> element, put it in body tag
+    ReactDOM.render(
+      <NuringChecklist />,
+      document.getElementById('app')
+    );
+
+
+  </script>
+  <div id="app"></div>
+
+</body>
+
+</html>

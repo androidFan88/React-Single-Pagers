@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ReactJS Hello, World!</title>
+
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <style>
+    h1 , h2 {
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    table {
+      border : 2px solid black;
+      width : 60%;
+      height : 60%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    td {
+      border : 2px solid black;
+      height : 200px;
+      width : 30%;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      font-size: 100px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .buttonwrapper {
+      width: 100%;
+      text-align: center;
+    }
+    .buttonwrapper > button {
+      width : 30%;
+      height : 70px;
+      margin-top: 10px;
+      background-color : rgba(135, 230, 253, 0.808); 
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <script type="text/babel">
+
+function TickTack () {
+
+  //Only an array to give the game key's and for the map function to display it for us
+  const [game , setGame] = React.useState([ [10 , 11 , 12] , [21 , 22, 23] , [31 , 32, 33]]);
+
+  //the actual board used for the game
+  const [board , setBoard] = React.useState([ ["" , "" , ""] , ["" , "",  ""] , ["" , "",  ""] ]);
+
+  //Status of the game, 
+  const [status , setStatus] = React.useState('Ready'); 
+  //next player, false is O true player is X
+  const [next , setNext] = React.useState(false);
+  //Number of moves made in a single match
+  const [movesMade , setMovesMade] = React.useState(0);
+  //String to display on top of the board
+  const [msg , setMsg] = React.useState(false);
+
+
+//new Game method, called by makeMove method and by Clear game button 
+function newGame () {
+  setBoard([ ["" , "" , ""] , 
+             ["" , "",  ""] , 
+             ["" , "",  ""] ]);
+  setNext(false);
+  setMovesMade(0);
+  setStatus('Ready');
+  
+}
+
+//Called from onClick of table td element, Makes a move on the board for the user
+function makeMove (i , j) {
+
+  let newBoard = board;
+
+  if (movesMade == 0) {
+    setMsg(true);
+  }
+  if (movesMade == 1) {
+    setMsg(false);
+  }
+
+  if ((board[i][j] == '') && (status == 'Ready')){
+    if (next) {
+      newBoard[i][j] = 'X';
+      setNext(!next);
+      setBoard(newBoard);
+      setMovesMade(movesMade + 1);
+    }
+    else if (!next) {
+      newBoard[i][j] = 'O';
+      setNext(!next);
+      setBoard(newBoard);
+      setMovesMade(movesMade + 1);
+    }
+  }
+  else {
+    alert("this spot has already been played!");
+  }
+
+  if (movesMade >= 4) {
+
+    let check= true;
+    
+    for (var k = 0; k < 3; k++) {
+      if ((newBoard[k][0] == newBoard[k][1] && newBoard[k][0] == newBoard[k][2] && newBoard[k][0] != '') || (newBoard[0][k] == newBoard[1][k] && newBoard[0][k] == newBoard[2][k] && newBoard[0][k] != '')) {
+        let str = (next) ? 'Xs have won!': 'Os have won!';
+      alert(str);
+      setStatus('Over');
+      check = false;
+      break;
+      }
+    }
+    if ((check == true) && ((newBoard[0][0] == newBoard[1][1] && newBoard[0][0] == newBoard[2][2]) || (newBoard[0][2] == newBoard[1][1] && newBoard[0][2] == newBoard[2][0]))) {
+      let str = (next) ? 'Xs have won!': 'Os have won!';
+      alert(str);
+      setStatus('Over');
+      check = false;
+    }
+    else if (movesMade >= 8 && check == true) {
+      alert('cats game');
+    }
+
+  }
+
+}
+
+const elem = (msg) ? <h2>There has been {movesMade} Move made {(next) ? 'it is Xs turn': 'it is Os turn'}</h2> : <h2>There have been {movesMade} Moves made {(next) ? 'it is Xs turn': 'it is Os turn'}</h2>;
+
+  //Tick Tack toe component return statement
+  return (
+    <div>
+      <h1>Tick tack Toe</h1>
+      {elem} 
+      <table>
+      <tbody>
+        {game.map( (x) => <tr key={x}>{x.map((y , index) => <td key={y} onClick={() => makeMove(game.indexOf(x) , index)}>{board[game.indexOf(x)][index]}</td>)}</tr>)}
+      </tbody>
+      </table>
+      <div className="buttonwrapper">
+      <button onClick={() =>  newGame()}>Clear game</button>
+      </div>
+    </div>
+  );
+}
+
+    // Rendering the Tick Tack Toe Component
+    ReactDOM.render(
+      <TickTack />,
+      document.getElementById('container')
+    );
+  </script>
+</body>
+
+</html>
