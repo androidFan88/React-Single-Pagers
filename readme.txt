@@ -1,4 +1,4 @@
-This reop consists of single page HTML applications using the javascript react library
+This repo consists of single page HTML applications using the javascript react library
 
 All apps in this repo are using react version 17
 
